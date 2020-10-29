@@ -4,6 +4,8 @@ import ICreateUserDTO from '../../dtos/ICreateUserDTO';
 import IUsersRepository from '../IUsersRepository';
 
 class FakeUsersRepository implements IUsersRepository {
+  private users: Array<User> = [];
+
   async create(userData: ICreateUserDTO): Promise<User> {
     const { name, email, password } = userData;
 
@@ -16,6 +18,8 @@ class FakeUsersRepository implements IUsersRepository {
       updated_at: new Date(),
     };
 
+    this.users.push(user);
+
     return user;
   }
 
@@ -23,8 +27,8 @@ class FakeUsersRepository implements IUsersRepository {
     throw new Error('Method not implemented.');
   }
 
-  findByEmail(email: string): Promise<User> {
-    throw new Error('Method not implemented.');
+  async findByEmail(email: string): Promise<User | undefined> {
+    return this.users.find(user => user.email === email);
   }
 }
 
