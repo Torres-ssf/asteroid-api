@@ -1,3 +1,4 @@
+import AppError from '../../../shared/errors/AppError';
 import User from '../entities/IUser';
 import IUsersRepository from '../repositories/IUsersRepository';
 
@@ -15,6 +16,12 @@ class CreateUserService {
   }
 
   async execute({ name, email, password }: IRequest): Promise<User> {
+    const userExists = await this.userRepository.findByEmail(email);
+
+    if (userExists) {
+      throw new AppError('Email address already taken');
+    }
+
     const user = this.userRepository.create({
       name,
       email,
