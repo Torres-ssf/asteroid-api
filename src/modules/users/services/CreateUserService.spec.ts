@@ -1,16 +1,22 @@
+import AppError from '@shared/errors/AppError';
 import CreateUserService from './CreateUserService';
 import FakeUsersRepository from '../repositories/fakes/FakeUsersRepository';
-import AppError from '../../../shared/errors/AppError';
+import FakeHashProvider from '../providers/HashProvider/fakes/FakeHashProvider';
 
 describe('CreateUser', () => {
   let fakeUsersRepository: FakeUsersRepository;
+
+  let fakeHashProvider: FakeHashProvider;
 
   let createUserService: CreateUserService;
 
   beforeEach(() => {
     fakeUsersRepository = new FakeUsersRepository();
-
-    createUserService = new CreateUserService(fakeUsersRepository);
+    fakeHashProvider = new FakeHashProvider();
+    createUserService = new CreateUserService(
+      fakeUsersRepository,
+      fakeHashProvider,
+    );
   });
 
   it('should create a new user', async () => {
@@ -40,10 +46,24 @@ describe('CreateUser', () => {
 
     await expect(
       createUserService.execute({
-        name: 'Paul',
+        name: 'Another Paul',
         email: 'paul@email.com',
-        password: '123456',
+        password: 'another password',
       }),
     ).rejects.toBeInstanceOf(AppError);
+  });
+
+  it('should call generateHash to hash the user password', async () => {
+    const spy = jest.spyOn(fakeHashProvider, 'generateHash');
+
+    const userPassword = '123123123';
+
+    await createUserService.execute({
+      name: 'Paul',
+      email: 'paul@email.com',
+      password: userPassword,
+    });
+
+    expect(spy).toHaveBeenCalledWith(userPassword);
   });
 });
