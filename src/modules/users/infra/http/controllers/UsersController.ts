@@ -1,15 +1,13 @@
 import { Request, Response } from 'express';
+import { container } from 'tsyringe';
 
-import MongooseUserRepository from '@modules/users/infra/mongoose/repositories/MongooseUsersRepository';
 import CreateUserService from '@modules/users/services/CreateUserService';
 
 class UsersController {
   async create(request: Request, response: Response): Promise<Response> {
     const { name, email, password } = request.body;
 
-    const usersRepository = new MongooseUserRepository();
-
-    const createUserService = new CreateUserService(usersRepository);
+    const createUserService = container.resolve(CreateUserService);
 
     const user = await createUserService.execute({ name, email, password });
 
