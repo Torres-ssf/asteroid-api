@@ -5,6 +5,7 @@ import User from '../entities/IUser';
 import IUsersRepository from '../repositories/IUsersRepository';
 
 import IHashProvider from '../providers/HashProvider/models/IHashProvider';
+import ITokenProvider from '../providers/TokenProvider/models/ITokenProvider';
 
 interface IRequest {
   email: string;
@@ -22,33 +23,47 @@ class AuthenticateUserService {
 
   private hashProvider: IHashProvider;
 
+  private tokenProvider: ITokenProvider;
+
   constructor(
     @inject('UsersRepository')
     usersRepository: IUsersRepository,
     @inject('HashProvider')
     hashProvider: IHashProvider,
+    @inject('TokenProvider')
+    tokenProvider: ITokenProvider,
   ) {
     this.usersRepository = usersRepository;
     this.hashProvider = hashProvider;
+    this.tokenProvider = tokenProvider;
   }
 
   async execute({ email, password }: IRequest): Promise<IResponse> {
-    const userExists = await this.usersRepository.findByEmail(email);
+    const user = await this.usersRepository.findByEmail(email);
 
-    if (!userExists) {
+    if (!user) {
       throw new AppError('Wrong user/password combination');
     }
 
     const passwordMatch = await this.hashProvider.compare(
       password,
-      userExists.password,
+      user.password,
     );
 
     if (!passwordMatch) {
       throw new AppError('Wrong user/password combination');
     }
 
-    throw new AppError('not finish implemented yet');
+    const token = this.tokenProvider.generate({
+      payload: { userId: user.id },
+      secret: 'developmentPurposeSecret',
+      expiresIn: '1d',
+    });
+
+    return {
+      user,
+      token,
+    };
   }
 }
 
