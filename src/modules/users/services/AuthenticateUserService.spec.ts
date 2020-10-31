@@ -70,16 +70,20 @@ describe('AuthenticateUser', () => {
     expect(spy).toHaveBeenCalledWith('123456', user.password);
   });
 
-  // it('should be able to authentica with the right crendentials', async () => {
-  //   const user = await fakeUserRepository.create({
-  //     name: 'Paul',
-  //     email: 'paul@email.com',
-  //     password: '123456',
-  //   });
+  it('should generate an authentication token when right credentials are provided', async () => {
+    const user = await fakeUserRepository.create({
+      name: 'Paul',
+      email: 'paul@email.com',
+      password: '123456',
+    });
 
-  //   await authenticateUser.execute({
-  //     email: p'aul@email.com',
-  //     password: '123456',
-  //   });
-  // });
+    const spy = jest.spyOn(fakeTokenProvider, 'generate');
+
+    await authenticateUser.execute({
+      email: user.email,
+      password: '123456',
+    });
+
+    expect(spy).toHaveBeenCalled();
+  });
 });
