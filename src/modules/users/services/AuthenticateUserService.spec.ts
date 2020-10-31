@@ -4,6 +4,7 @@ import AppError from '@shared/errors/AppError';
 import FakeUserRepository from '../repositories/fakes/FakeUsersRepository';
 import FakeHashProvider from '../providers/HashProvider/fakes/FakeHashProvider';
 import AuthenticateUser from './AuthenticateUserService';
+import FakeTokenProvider from '../providers/TokenProvider/fakes/FakeTokenProvider';
 
 describe('AuthenticateUser', () => {
   let authenticateUser: AuthenticateUser;
@@ -12,12 +13,17 @@ describe('AuthenticateUser', () => {
 
   let fakeHashProvider: FakeHashProvider;
 
+  let fakeTokenProvider: FakeTokenProvider;
+
   beforeEach(() => {
     fakeUserRepository = new FakeUserRepository();
     fakeHashProvider = new FakeHashProvider();
+    fakeTokenProvider = new FakeTokenProvider();
+
     authenticateUser = new AuthenticateUser(
       fakeUserRepository,
       fakeHashProvider,
+      fakeTokenProvider,
     );
   });
 
@@ -47,22 +53,33 @@ describe('AuthenticateUser', () => {
     ).rejects.toBeInstanceOf(AppError);
   });
 
-  // it('HashProvider compare method should be called with the given password', async () => {
+  it('should compare the hashed password with given password', async () => {
+    const user = await fakeUserRepository.create({
+      name: 'Paul',
+      email: 'paul@email.com',
+      password: '123456',
+    });
+
+    const spy = jest.spyOn(fakeHashProvider, 'compare');
+
+    await authenticateUser.execute({
+      email: 'paul@email.com',
+      password: '123456',
+    });
+
+    expect(spy).toHaveBeenCalledWith('123456', user.password);
+  });
+
+  // it('should be able to authentica with the right crendentials', async () => {
   //   const user = await fakeUserRepository.create({
   //     name: 'Paul',
   //     email: 'paul@email.com',
   //     password: '123456',
   //   });
 
-  //   console.log(user);
-
-  //   const spy = jest.spyOn(fakeHashProvider, 'compare');
-
   //   await authenticateUser.execute({
-  //     email: 'paul@email.com',
+  //     email: p'aul@email.com',
   //     password: '123456',
   //   });
-
-  //   expect(spy).toHaveBeenCalledWith(123456);
   // });
 });
