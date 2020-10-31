@@ -86,4 +86,25 @@ describe('AuthenticateUser', () => {
 
     expect(spy).toHaveBeenCalled();
   });
+
+  it('should authenticate a user when right credentials are provided', async () => {
+    await fakeUserRepository.create({
+      name: 'Paul',
+      email: 'paul@email.com',
+      password: '123456',
+    });
+
+    const { user, token } = await authenticateUser.execute({
+      email: 'paul@email.com',
+      password: '123456',
+    });
+
+    expect(typeof token).toBe('string');
+
+    expect(user).toMatchObject({
+      name: 'Paul',
+      email: 'paul@email.com',
+      password: '123456',
+    });
+  });
 });
