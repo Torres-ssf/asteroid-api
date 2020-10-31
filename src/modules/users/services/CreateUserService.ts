@@ -1,4 +1,5 @@
 import AppError from '@shared/errors/AppError';
+import { inject, injectable } from 'tsyringe';
 import User from '../entities/IUser';
 import IUsersRepository from '../repositories/IUsersRepository';
 import IHashProvider from '../providers/HashProvider/models/IHashProvider';
@@ -9,12 +10,18 @@ interface IRequest {
   password: string;
 }
 
+@injectable()
 class CreateUserService {
   private userRepository: IUsersRepository;
 
   private hashProvider: IHashProvider;
 
-  constructor(userRepository: IUsersRepository, hashProvider: IHashProvider) {
+  constructor(
+    @inject('UsersRepository')
+    userRepository: IUsersRepository,
+    @inject('HashProvider')
+    hashProvider: IHashProvider,
+  ) {
     this.userRepository = userRepository;
     this.hashProvider = hashProvider;
   }
