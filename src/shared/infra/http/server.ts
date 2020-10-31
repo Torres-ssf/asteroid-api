@@ -1,7 +1,11 @@
+import 'reflect-metadata';
+
 import express from 'express';
 
-import appRoutes from './routes';
 import '@config/database';
+import '@shared/container';
+
+import appRoutes from './routes';
 
 const app = express();
 
