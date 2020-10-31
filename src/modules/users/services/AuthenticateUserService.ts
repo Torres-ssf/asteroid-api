@@ -39,6 +39,15 @@ class AuthenticateUserService {
       throw new AppError('Wrong user/password combination');
     }
 
+    const passwordMatch = await this.hashProvider.compare(
+      password,
+      userExists.password,
+    );
+
+    if (!passwordMatch) {
+      throw new AppError('Wrong user/password combination');
+    }
+
     throw new AppError('not finish implemented yet');
   }
 }
