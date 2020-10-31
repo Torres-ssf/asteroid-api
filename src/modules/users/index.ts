@@ -5,6 +5,6 @@ import IUsersRepository from './repositories/IUsersRepository';
 import MongooseUsersRepository from './infra/mongoose/repositories/MongooseUsersRepository';
 
 container.registerSingleton<IUsersRepository>(
-  'IUsersRepository',
+  'UsersRepository',
   MongooseUsersRepository,
 );
