@@ -1,12 +1,13 @@
 import 'reflect-metadata';
-
-import express, { json, Request, Response, NextFunction } from 'express';
+import 'dotenv/config';
 import 'express-async-errors';
 
-import AppError from '@shared/errors/AppError';
+import express, { json, Request, Response, NextFunction } from 'express';
 
 import '@config/database';
 import '@shared/container';
+
+import AppError from '@shared/errors/AppError';
 
 import appRoutes from './routes';
 
