@@ -1,4 +1,4 @@
-import { sign, verify as jwtVerify } from 'jsonwebtoken';
+import { sign, verify as jwtVerify, VerifyCallback } from 'jsonwebtoken';
 
 import ITokenProvider from '../models/ITokenProvider';
 import IGenerateTokeDTO from '../dtos/IGenerateTokeDTO';
@@ -15,9 +15,13 @@ class JWTTokenProvider implements ITokenProvider {
   }
 
   verify(token: string, secret: string): string | undefined {
-    const { sub } = jwtVerify(token, secret) as ITokenPayLoad;
+    try {
+      const decoded = jwtVerify(token, secret) as ITokenPayLoad;
 
-    return sub;
+      return decoded.sub;
+    } catch {
+      return undefined;
+    }
   }
 }
 
