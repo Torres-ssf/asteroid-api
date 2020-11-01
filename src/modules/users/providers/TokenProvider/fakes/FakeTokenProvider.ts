@@ -33,11 +33,7 @@ class FakeTokenProvider implements ITokenProvider {
       item => item.token === token,
     );
 
-    if (!tokenObjectExists) {
-      return undefined;
-    }
-
-    if (tokenObjectExists.secret !== secret) {
+    if (!tokenObjectExists || tokenObjectExists.secret !== secret) {
       return undefined;
     }
 
