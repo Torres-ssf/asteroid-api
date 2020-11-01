@@ -13,15 +13,11 @@ usersRoutes.post(
     [Segments.BODY]: Joi.object().keys({
       name: Joi.string().required(),
       email: Joi.string().email().required(),
-      password: Joi.string().min(6),
+      password: Joi.string().min(6).required(),
       password_confirmation: Joi.string().required().valid(Joi.ref('password')),
     }),
   }),
   usersController.create,
 );
-
-usersRoutes.get('/', (req, res) => {
-  return res.send('hello there');
-});
 
 export default usersRoutes;
