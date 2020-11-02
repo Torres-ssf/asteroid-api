@@ -45,4 +45,16 @@ describe('UserProfile', () => {
       showProfileService.execute('not an actually user id'),
     ).rejects.toBeInstanceOf(AppError);
   });
+
+  it("should return the data from the user's given id", async () => {
+    const user = await createUserService.execute({
+      name: 'John',
+      email: 'john@email.com',
+      password: '123456',
+    });
+
+    const res = await showProfileService.execute(user.id);
+
+    expect(res).toMatchObject(user);
+  });
 });
