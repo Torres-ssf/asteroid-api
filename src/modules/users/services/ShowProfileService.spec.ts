@@ -39,4 +39,10 @@ describe('UserProfile', () => {
 
     expect(spy).toHaveBeenCalledWith(user.id);
   });
+
+  it('should return an error if no user was found by the given id', async () => {
+    await expect(
+      showProfileService.execute('not an actually user id'),
+    ).rejects.toBeInstanceOf(AppError);
+  });
 });
