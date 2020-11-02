@@ -1,12 +1,15 @@
 import 'reflect-metadata';
-
-import express, { json, Request, Response, NextFunction } from 'express';
+import 'dotenv/config';
 import 'express-async-errors';
 
-import AppError from '@shared/errors/AppError';
+import express, { json, Request, Response, NextFunction } from 'express';
+
+import { errors } from 'celebrate';
 
 import '@config/database';
 import '@shared/container';
+
+import AppError from '@shared/errors/AppError';
 
 import appRoutes from './routes';
 
@@ -15,6 +18,8 @@ const app = express();
 app.use(json());
 
 app.use(appRoutes);
+
+app.use(errors());
 
 app.use((err: Error, req: Request, res: Response, _: NextFunction) => {
   if (err instanceof AppError) {
