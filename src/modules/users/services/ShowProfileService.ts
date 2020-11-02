@@ -1,14 +1,17 @@
 import AppError from '@shared/errors/AppError';
-import { injectable, inject } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 
 import User from '../entities/IUser';
 import IUsersRepository from '../repositories/IUsersRepository';
 
-injectable();
+@injectable()
 class ShowProfileService {
   private usersRepository: IUsersRepository;
 
-  constructor(usersRepository: IUsersRepository) {
+  constructor(
+    @inject('UsersRepository')
+    usersRepository: IUsersRepository,
+  ) {
     this.usersRepository = usersRepository;
   }
 
