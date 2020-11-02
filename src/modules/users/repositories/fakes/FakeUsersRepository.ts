@@ -23,8 +23,8 @@ class FakeUsersRepository implements IUsersRepository {
     return user;
   }
 
-  findById(id: string): Promise<User> {
-    throw new Error('Method not implemented.');
+  async findById(id: string): Promise<User | undefined> {
+    return this.users.find(user => user.id === id);
   }
 
   async findByEmail(email: string): Promise<User | undefined> {
