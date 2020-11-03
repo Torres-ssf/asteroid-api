@@ -4,12 +4,20 @@ import CreateUserService from './CreateUserService';
 import FakeUsersRepository from '../repositories/fakes/FakeUsersRepository';
 import FakeHashProvider from '../providers/HashProvider/fakes/FakeHashProvider';
 
+interface IUserCredentials {
+  name: string;
+  email: string;
+  password: string;
+}
+
 describe('CreateUser', () => {
   let fakeUsersRepository: FakeUsersRepository;
 
   let fakeHashProvider: FakeHashProvider;
 
   let createUserService: CreateUserService;
+
+  let userCredentials: IUserCredentials;
 
   beforeEach(() => {
     fakeUsersRepository = new FakeUsersRepository();
@@ -18,53 +26,41 @@ describe('CreateUser', () => {
       fakeUsersRepository,
       fakeHashProvider,
     );
+
+    userCredentials = {
+      name: 'Paul',
+      email: 'paul@email.com',
+      password: '123456',
+    };
   });
 
   it('should create a new user', async () => {
-    const user = await createUserService.execute({
-      name: 'Paul',
-      email: 'paul@email.com',
-      password: '123456',
-    });
+    const res = await createUserService.execute(userCredentials);
 
-    expect(user).toMatchObject({
-      name: 'Paul',
-      email: 'paul@email.com',
-      password: '123456',
-    });
-
-    expect(user).toHaveProperty('id');
-    expect(user).toHaveProperty('created_at');
-    expect(user).toHaveProperty('updated_at');
+    expect(res).toMatchObject(userCredentials);
   });
 
   it('should not create a new user with an email already in use', async () => {
-    await createUserService.execute({
-      name: 'Paul',
-      email: 'paul@email.com',
-      password: '123456',
-    });
+    await createUserService.execute(userCredentials);
 
     await expect(
-      createUserService.execute({
-        name: 'Another Paul',
-        email: 'paul@email.com',
-        password: 'another password',
-      }),
+      createUserService.execute(userCredentials),
     ).rejects.toBeInstanceOf(AppError);
   });
 
-  it('should call generateHash to hash the user password', async () => {
+  it('should use password to generate a hashed password', async () => {
     const spy = jest.spyOn(fakeHashProvider, 'generateHash');
 
-    const userPassword = '123123123';
+    await createUserService.execute(userCredentials);
 
-    await createUserService.execute({
-      name: 'Paul',
-      email: 'paul@email.com',
-      password: userPassword,
-    });
+    expect(spy).toHaveBeenCalledWith(userCredentials.password);
+  });
 
-    expect(spy).toHaveBeenCalledWith(userPassword);
+  it('should create the new user with a hashed password', async () => {
+    const spy = jest.spyOn(fakeHashProvider, 'generateHash');
+
+    const res = await createUserService.execute(userCredentials);
+
+    expect(spy).toHaveReturnedWith(fakeHashProvider.generateHash(res.password));
   });
 });
